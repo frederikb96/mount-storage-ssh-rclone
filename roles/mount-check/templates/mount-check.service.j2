@@ -1,15 +1,15 @@
 [Unit]
-Description=Mount Storage via rclone
+Description=Check the mount
 Wants=network-online.target
-After=network-online.target mount-storage.service
+After=network-online.target {{ storage_service_name }}
 Before=docker.service
 
 [Service]
-Type=notify
-ExecStart={{ script_dir }}/{{ script_name }} --start
-ExecStop={{ script_dir }}/{{ script_name }} --stop
-TimeoutStopSec=180s
-TimeoutStartSec=180s
+# the start will run in a loop forever
+Type=#todo
+ExecStart={{ script_dir }}/{{ script_check }}
+TimeoutStopSec=10s
+TimeoutStartSec=10s
 Restart=on-failure
 RestartSec=30s
 

@@ -5,7 +5,7 @@
 
 # create the script_dir
 
-# copy the script_name script to script_dir
+# copy the script_storage script to script_dir
 # make the script executable
 
 # reload systemd

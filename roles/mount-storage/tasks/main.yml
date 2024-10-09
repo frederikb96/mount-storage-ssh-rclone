@@ -40,19 +40,19 @@
 - name: Copy the mount-storage script to the script directory
   ansible.builtin.template:
     src: "mount-storage.sh.j2"
-    dest: "{{ script_dir }}/{{ script_name }}"
+    dest: "{{ script_dir }}/{{ script_storage }}"
     mode: '0755'
 
 - name: Make the script executable
   ansible.builtin.file:
-    path: "{{ script_dir }}/{{ script_name }}"
+    path: "{{ script_dir }}/{{ script_storage }}"
     mode: '0755'
     state: file
 
 - name: Copy the mount-storage service template to /etc/systemd/system
   ansible.builtin.template:
     src: "mount-storage.service.j2"
-    dest: "{{ systemd_dir }}/{{ systemd_service_name }}"
+    dest: "{{ systemd_dir }}/{{ storage_service_name }}"
     mode: '0644'
 
 - name: Reload systemd
@@ -61,10 +61,10 @@
 
 - name: Enable the mount-storage service
   ansible.builtin.systemd:
-    name: "{{ systemd_service_name }}"
+    name: "{{ storage_service_name }}"
     enabled: yes
 
 - name: Start the mount-storage service
   ansible.builtin.systemd:
-    name: "{{ systemd_service_name }}"
+    name: "{{ storage_service_name }}"
     state: started
