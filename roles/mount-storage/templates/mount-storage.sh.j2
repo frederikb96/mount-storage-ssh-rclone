@@ -1,0 +1,67 @@
+#!/bin/bash
+
+
+
+# Stop function
+function stop() {
+    echo "Stopping..."
+    # umount  all the subs, loop via the jinja2 template variables
+    # and then umount the main mount
+    # and then umount the rclone mount
+
+    # if one of those fails then do cleanup, where all are forced umounted
+}
+
+# Cleanup function
+function cleanup() {
+    echo "Cleaning up..."
+    # umount all the subs, loop via the jinja2 template variables
+    # and then umount the main mount
+    # and then umount the rclone mount
+
+    # all with -lf
+}
+
+# here the check mounts function should be implemented, used in the startup function
+
+
+# Startup function
+function startup() {
+    echo "Starting..."
+
+    # loop through all the sub mounts (jinja2 variables used for this) and the main mount and if one of those is already mounted, then do cleanup and then do the same check again and if 
+    # it is still mounted then exit with error
+    # otherwise continue
+    
+
+    echo "Start main mount"
+    if ! timeout 180s rclone mount {{ mount_crypt }}: {{ mount_dest }} --allow-non-empty --vfs-cache-mode full --vfs-cache-max-size 100G --vfs-cache-max-age 720h --vfs-disk-space-total-size 5T --uid 0 --gid 0 --attr-timeout 168h --dir-cache-time 720h --poll-interval 168h --cache-dir {{ cache_dir }} --daemon --daemon-wait 180s; then
+        stop
+        exit 1
+    fi
+    # Wait for mount to become really ready!
+    sleep 5
+
+    # now loop through all the sub mounts and mount them (jinja2 variables used for this)
+    # first create dir for mount_subs/sub directories
+    # and then mount them with bindfs with the flag to change the user mapping via --map=root/user:@root/@user
+
+    # if any fails then do stop and exit with error
+
+    echo "Startup mount process complete"
+}
+
+
+# Parse command line arguments
+case "$1" in
+    --start)
+        startup
+        ;;
+    --stop)
+        stop
+        ;;
+    *)
+        exit 1
+        ;;
+esac
+

@@ -1,0 +1,16 @@
+[{{ mount_sftp }}]
+type = sftp
+host = {{ sftp_host }}
+user =   {{ sftp_user }}
+port = {{ sftp_port }}
+key_file = /root/.ssh/id_rsa
+md5sum_command = md5 -r
+sha1sum_command = sha1 -r
+shell_type = unix
+
+[{{ mount_crypt }}]
+type = crypt
+remote = {{ mount_sftp }}:crypt
+filename_encryption = standard
+directory_name_encryption = true
+password = {{ hetzner_crypt_password }}

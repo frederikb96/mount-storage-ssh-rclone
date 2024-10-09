@@ -1,0 +1,52 @@
+#!/bin/bash
+
+# Function to send email, if an error occurred and not already sent
+function send_email() {
+    echo "Sending email..."
+    local subject="$1"
+    local body="$2"
+    echo -e "Subject:${subject}\n\n ${body}" | sendmail "$SENDMAIL_RECIPIENT"
+}
+
+# Cleanup function
+function cleanup() {
+    echo "Cleaning up..."
+    umount -lf $MOUNT_POINT
+}
+
+# Check function
+function check() {
+    if ! mount | grep -q "$MOUNT_POINT"; then
+        if [ ! -f "$ERROR_FLAG" ]; then
+            echo "ERROR: Mount not available, sending email..."
+            touch "$ERROR_FLAG"
+            send_email "CRITICAL server $MOUNT_POINT Mount Unavailable" "The mount is unavailable."
+        fi
+        return 1
+    fi
+    return 0
+}
+
+# Routine function
+function routine() {
+    echo "Routine..."
+    systemd-notify --ready
+    while true; do
+        if ! check; then
+            echo "Error occurred, cleaning up..."
+            cleanup
+            exit 1
+        fi
+        if [ -f "$ERROR_FLAG" ]; then
+            echo "Clearing error flag..."
+            send_email "CLEAR server $MOUNT_POINT available again" "Up and running again. Check for integrity yourself"
+            # remove flag if it exists since cleared
+            rm "$ERROR_FLAG"
+        fi
+        sleep 30
+    done
+}
+
+# Execute routine
+routine
+

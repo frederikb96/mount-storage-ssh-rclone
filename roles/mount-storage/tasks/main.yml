@@ -1,0 +1,19 @@
+---
+# todo
+
+# one task to loop through the user_subs and create the users with a home dir but no password
+# also for each create in home dir an authorized_keys with empty content in .ssh
+
+# create the script_dir
+
+# copy the script_name script to script_dir
+
+# make the script executable
+
+# copy over the service template to /etc/systemd/system/mount-storage.service
+
+# reload systemd
+# enable the service
+# start the service
+
+

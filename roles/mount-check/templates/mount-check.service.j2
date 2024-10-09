@@ -1,0 +1,17 @@
+[Unit]
+Description=Mount Storage via rclone
+Wants=network-online.target
+After=network-online.target mount-storage.service
+Before=docker.service
+
+[Service]
+Type=notify
+ExecStart={{ script_dir }}/{{ script_name }} --start
+ExecStop={{ script_dir }}/{{ script_name }} --stop
+TimeoutStopSec=180s
+TimeoutStartSec=180s
+Restart=on-failure
+RestartSec=30s
+
+[Install]
+WantedBy=multi-user.target
