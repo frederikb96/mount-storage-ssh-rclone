@@ -1,56 +1,80 @@
 #!/bin/bash
 
-
-
 # Stop function
 function stop() {
     echo "Stopping..."
-    # umount  all the subs, loop via the jinja2 template variables
-    # and then umount the main mount
-    # and then umount the rclone mount
+    # Unmount all the subdirectories
+    for sub in {% for entry in subs %}{{ entry.sub }} {% endfor %}; do
+        umount /mnt/storage/{{ sub }}
+    done
 
-    # if one of those fails then do cleanup, where all are forced umounted
+    # Unmount the main mount
+    umount {{ mount_point }}
+
+    # Unmount the rclone mount
+    umount {{ mount_sftp }}
+
+    # If any unmounting fails, forcefully unmount all
+    cleanup
 }
 
 # Cleanup function
 function cleanup() {
-    echo "Cleaning up..."
-    # umount all the subs, loop via the jinja2 template variables
-    # and then umount the main mount
-    # and then umount the rclone mount
+    # Forcefully unmount all subdirectories
+    for sub in {% for entry in subs %}{{ entry.sub }} {% endfor %}; do
+        umount -lf /mnt/storage/{{ sub }}
+    done
 
-    # all with -lf
+    # Forcefully unmount the main mount
+    umount -lf {{ mount_point }}
+
+    # Forcefully unmount the rclone mount
+    umount -lf {{ mount_sftp }}
 }
 
-# here the check mounts function should be implemented, used in the startup function
-
+# Function to check if mounts are already active
+function check_mounts() {
+    # Check if any of the mounts are already mounted
+    mount | grep -q "{{ mount_point }}" && return 1
+    for sub in {% for entry in subs %}{{ entry.sub }} {% endfor %}; do
+        mount | grep -q "/mnt/storage/{{ sub }}" && return 1
+    done
+    return 0
+}
 
 # Startup function
 function startup() {
     echo "Starting..."
 
-    # loop through all the sub mounts (jinja2 variables used for this) and the main mount and if one of those is already mounted, then do cleanup and then do the same check again and if 
-    # it is still mounted then exit with error
-    # otherwise continue
-    
+    # Check if mounts are active, if so perform cleanup
+    if ! check_mounts; then
+        echo "Mounts already active. Cleaning up..."
+        cleanup
+        if ! check_mounts; then
+            echo "Cleanup failed, exiting."
+            exit 1
+        fi
+    fi
 
     echo "Start main mount"
-    if ! timeout 180s rclone mount {{ mount_crypt }}: {{ mount_dest }} --allow-non-empty --vfs-cache-mode full --vfs-cache-max-size 100G --vfs-cache-max-age 720h --vfs-disk-space-total-size 5T --uid 0 --gid 0 --attr-timeout 168h --dir-cache-time 720h --poll-interval 168h --cache-dir {{ cache_dir }} --daemon --daemon-wait 180s; then
+    if ! timeout 180s rclone mount {{ mount_crypt }}: {{ mount_point }} --allow-non-empty --vfs-cache-mode full --vfs-cache-max-size 100G --vfs-cache-max-age 720h --vfs-disk-space-total-size 5T --uid 0 --gid 0 --attr-timeout 168h --dir-cache-time 720h --poll-interval 168h --cache-dir {{ cache_dir }} --daemon --daemon-wait 180s; then
         stop
         exit 1
     fi
-    # Wait for mount to become really ready!
+    # Wait for the main mount to become fully ready
     sleep 5
 
-    # now loop through all the sub mounts and mount them (jinja2 variables used for this)
-    # first create dir for mount_subs/sub directories
-    # and then mount them with bindfs with the flag to change the user mapping via --map=root/user:@root/@user
-
-    # if any fails then do stop and exit with error
+    # Loop through and mount all subdirectories
+    for sub in {% for entry in subs %}{{ entry.sub }} {% endfor %}; do
+        mkdir -p {{ mount_subs }}/{{ sub }}
+        if ! bindfs --map=root/{{ entry.user }}:@root/@{{ entry.user }} /mnt/storage-main/{{ sub }} {{ mount_subs }}/{{ sub }}; then
+            stop
+            exit 1
+        fi
+    done
 
     echo "Startup mount process complete"
 }
-
 
 # Parse command line arguments
 case "$1" in
@@ -64,4 +88,3 @@ case "$1" in
         exit 1
         ;;
 esac
-

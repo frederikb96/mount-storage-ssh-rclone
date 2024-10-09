@@ -1,5 +1,6 @@
 ---
 - hosts: all
+  become: yes
   roles:
     - mount-storage
     - mount-check
