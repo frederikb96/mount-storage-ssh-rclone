@@ -31,6 +31,14 @@
     name: bindfs
     state: present
 
+- name: Copy rclone config file
+  ansible.builtin.template:
+    src: "rclone.conf.j2"
+    dest: "/etc/rclone/rclone.conf"
+    owner: root
+    group: root
+    mode: '0644'
+
 - name: Create the script directory
   ansible.builtin.file:
     path: "{{ script_dir }}"

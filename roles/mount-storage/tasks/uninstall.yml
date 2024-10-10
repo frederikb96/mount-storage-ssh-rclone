@@ -29,6 +29,11 @@
     path: "{{ script_dir }}"
     state: absent
 
+- name: Remove rclone config file
+  ansible.builtin.file:
+    path: "/etc/rclone/rclone.conf"
+    state: absent
+
 - name: Ensure users from user_subs are removed
   ansible.builtin.user:
     name: "{{ item }}"
