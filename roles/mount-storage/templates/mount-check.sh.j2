@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # This script should check SSH mount ping, ensure it's always reachable within a certain timeout, and check if the mounts are all available via grep and the mount points.
-# If any of those checks fail, it sends an email and enters a loop where it continuously checks until the mount is available again, and then triggers a server reboot.
+# If any of those checks fail, it sends an email and enters a loop where it continuously checks SSH until it becomes available again, and then triggers a server reboot.
 
 # Function to send email if an error occurs and one has not already been sent
 function send_email() {
@@ -11,13 +11,23 @@ function send_email() {
     echo -e "Subject:${subject}\n\n${body}" | sendmail "{{ sendmail_recipient }}"
 }
 
-# Check function
-# Try to perform a simple `ls` over SSH with a timeout, and check if the mount points are available using grep.
+# SSH check function
+# Try to perform a simple `ls` over SSH with a timeout.
+# Return 0 if SSH is reachable, 1 if not.
+function check_ssh() {
+    if ! timeout 10s ssh -p {{ sftp_port }} {{ sftp_user }}@{{ sftp_host }} ls > /dev/null 2>&1; then
+        echo "SSH check failed"
+        return 1
+    fi
+    return 0
+}
+
+# Full check function
+# Perform SSH check and check if the mount points are available using grep.
 # Return 0 if everything is ok, 1 if not.
 function check() {
     # Check SSH connectivity
-    if ! timeout 5s ssh -p {{ sftp_port }} {{ sftp_user }}@{{ sftp_host }} ls > /dev/null 2>&1; then
-        echo "SSH check failed"
+    if ! check_ssh; then
         return 1
     fi
 
@@ -35,7 +45,7 @@ function check() {
         return 1
     fi
 
-    # If both checks pass
+    # If all checks pass
     return 0
 }
 
@@ -44,18 +54,18 @@ function routine() {
     echo "Routine started..."
     systemd-notify --ready
     while true; do
-        # Perform the check
+        # Perform the full check
         if ! check; then
             echo "Error occurred"
             send_email "ERROR: Mount on {{ sendmail_device }}" "The storage mount is unavailable."
-            # Enter a loop to keep checking until the mount is available again
+            # Enter a loop to keep checking only SSH until it's available again, then reboot
             while true; do
-                if check; then
-                    echo "Mount is available again, rebooting..."
-                    send_email "CLEAR: Mount on {{ sendmail_device }}" "The storage mount is available again. Rebooting..."
+                if check_ssh; then
+                    echo "SSH is available again, rebooting..."
+                    send_email "CLEAR: Mount on {{ sendmail_device }}" "SSH is available again. Rebooting..."
                     /usr/bin/systemctl reboot
                 fi
-                sleep 60  # Wait for a minute before retrying
+                sleep 60  # Wait for a minute before retrying SSH check
             done
         fi
         sleep 60  # Wait for a minute before the next routine check

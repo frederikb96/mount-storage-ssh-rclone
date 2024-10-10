@@ -20,6 +20,7 @@ function stop() {
 
 # Cleanup function
 function cleanup() {
+    echo "Cleaning up..."
     # Forcefully unmount all subdirectories
     {% for entry in subs %}
     umount -lf {{ mount_subs }}/{{ entry.sub }}
@@ -54,12 +55,14 @@ function startup() {
     fi
 
     echo "Start main mount"
-    if ! timeout 180s rclone mount {{ mount_crypt }}: {{ mount_point }} --allow-non-empty --vfs-cache-mode full --vfs-cache-max-size 100G --vfs-cache-max-age 720h --vfs-disk-space-total-size 5T --uid 0 --gid 0 --attr-timeout 168h --dir-cache-time 720h --poll-interval 168h --cache-dir {{ cache_dir }} --daemon --daemon-wait 180s; then
+    mkdir -p {{ mount_point }}
+    if ! timeout 180s rclone mount {{ mount_crypt }}: {{ mount_point }} --allow-non-empty --vfs-cache-mode full --vfs-cache-max-size 100G --vfs-cache-max-age 720h --uid 0 --gid 0 --attr-timeout 168h --dir-cache-time 720h --poll-interval 168h --cache-dir {{ cache_dir }} --daemon; then
         stop
         exit 1
     fi
-    # Wait for the main mount to become fully ready
-    sleep 5
+    # Do a grep on mount and wait for the mount to be ready, but at max 180s
+    timeout 180s bash -c 'while ! mount | grep -q "{{ mount_point }}"; do sleep 1; done'
+    sleep 2
 
     # Loop through and mount all subdirectories
     {% for entry in subs %}
