@@ -2,19 +2,17 @@
 Description=Mount Storage
 Wants=network-online.target
 After=network-online.target
-Before=docker.service {{ check_service_name }}
+Before=docker.service
 
 [Service]
-# the start will run once and then exit, once it is mounted
-# can we make it that the sys
-# can we make it, that if it exists with 0, it is all fine. but if exits with 1, it will restart
-Type=#todo
-ExecStart={{ script_dir }}/{{ script_storage }} --start
+Type=notify
+ExecStartPre={{ script_dir }}/{{ script_storage }} --start
+ExecStart={{ script_dir }}/{{ script_check }} 
 ExecStop={{ script_dir }}/{{ script_storage }} --stop
 TimeoutStopSec=180s
 TimeoutStartSec=180s
 Restart=on-failure
-RestartSec=10s
+RestartSec=30s
 
 [Install]
 WantedBy=multi-user.target

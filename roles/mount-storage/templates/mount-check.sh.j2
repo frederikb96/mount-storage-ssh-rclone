@@ -1,46 +1,60 @@
 #!/bin/bash
 
-# Function to send email, if an error occurred and not already sent
+# This script should check SSH mount ping, ensure it's always reachable within a certain timeout, and check if the mounts are all available via grep and the mount points.
+# If any of those checks fail, it sends an email and enters a loop where it continuously checks until the mount is available again, and then triggers a server reboot.
+
+# Function to send email if an error occurs and one has not already been sent
 function send_email() {
     echo "Sending email..."
     local subject="$1"
     local body="$2"
-    echo -e "Subject:${subject}\n\n ${body}" | sendmail "$SENDMAIL_RECIPIENT"
+    echo -e "Subject:${subject}\n\n${body}" | sendmail "{{ sendmail_recipient }}"
 }
 
 # Check function
+# Try to perform a simple `ls` over SSH with a timeout, and check if the mount points are available using grep.
+# Return 0 if everything is ok, 1 if not.
 function check() {
-    if ! mount | grep -q "$MOUNT_POINT"; then
-        if [ ! -f "$ERROR_FLAG" ]; then
-            echo "ERROR: Mount not available, sending email..."
-            touch "$ERROR_FLAG"
-            send_email "CRITICAL server $MOUNT_POINT Mount Unavailable" "The mount is unavailable."
-        fi
+    # Check SSH connectivity
+    if ! timeout 5s ssh -p {{ sftp_port }} {{ sftp_user }}@{{ sftp_host }} ls > /dev/null 2>&1; then
+        echo "SSH check failed"
         return 1
     fi
+
+    # Check mount points
+    for sub in {% for entry in subs %}{{ entry.sub }} {% endfor %}; do
+        if ! mount | grep -q "{{ mount_subs }}/{{ sub }}"; then
+            echo "Mount {{ mount_subs }}/{{ sub }} is not available"
+            return 1
+        fi
+    done
+
+    # If both checks pass
     return 0
 }
 
 # Routine function
 function routine() {
-    echo "Routine..."
+    echo "Routine started..."
     systemd-notify --ready
     while true; do
+        # Perform the check
         if ! check; then
-            echo "Error occurred, cleaning up..."
-            cleanup
-            exit 1
+            echo "Error occurred"
+            send_email "ERROR: Mount on {{ sendmail_device }}" "The storage mount is unavailable."
+            # Enter a loop to keep checking until the mount is available again
+            while true; do
+                if check; then
+                    echo "Mount is available again, rebooting..."
+                    send_email "CLEAR: Mount on {{ sendmail_device }}" "The storage mount is available again. Rebooting..."
+                    /usr/bin/systemctl reboot
+                fi
+                sleep 60  # Wait for a minute before retrying
+            done
         fi
-        if [ -f "$ERROR_FLAG" ]; then
-            echo "Clearing error flag..."
-            send_email "CLEAR server $MOUNT_POINT available again" "Up and running again. Check for integrity yourself"
-            # remove flag if it exists since cleared
-            rm "$ERROR_FLAG"
-        fi
-        sleep 30
+        sleep 60  # Wait for a minute before the next routine check
     done
 }
 
 # Execute routine
 routine
-

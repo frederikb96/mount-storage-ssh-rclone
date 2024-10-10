@@ -1,0 +1,41 @@
+---
+- name: Stop the mount-storage service
+  ansible.builtin.systemd:
+    name: "{{ storage_service_name }}"
+    state: stopped
+
+- name: Disable the mount-storage service
+  ansible.builtin.systemd:
+    name: "{{ storage_service_name }}"
+    enabled: no
+
+- name: Remove the mount-storage service file from systemd
+  ansible.builtin.file:
+    path: "{{ systemd_dir }}/{{ storage_service_name }}"
+    state: absent
+
+- name: Remove the mount-storage script from the script directory
+  ansible.builtin.file:
+    path: "{{ script_dir }}/{{ script_storage }}"
+    state: absent
+
+- name: Remove the mount-check script from the script directory
+  ansible.builtin.file:
+    path: "{{ script_dir }}/{{ script_check }}"
+    state: absent
+
+- name: Remove the script directory if empty
+  ansible.builtin.file:
+    path: "{{ script_dir }}"
+    state: absent
+
+- name: Ensure users from user_subs are removed
+  ansible.builtin.user:
+    name: "{{ item }}"
+    state: absent
+    remove: yes  # Removes the user and their home directory
+  loop: "{{ user_subs }}"
+
+- name: Reload systemd to reflect the removal of the service
+  ansible.builtin.systemd:
+    daemon_reload: yes

@@ -1,70 +1,9 @@
 ---
-- name: Ensure users from user_subs are created with home directory but no password
-  ansible.builtin.user:
-    name: "{{ item }}"
-    home: "/home/{{ item }}"
-    createhome: yes
-    shell: /bin/bash
-    password: "*"
-    state: present
-  loop: "{{ user_subs }}"
+- name: Check if operation is install or uninstall
+  ansible.builtin.include_tasks: "{{ operation }}.yml"
+  when: operation in ['install', 'uninstall']
 
-- name: Ensure .ssh directory exists and authorized_keys is empty for each user
-  file:
-    path: "/home/{{ item }}/.ssh"
-    state: directory
-    owner: "{{ item }}"
-    group: "{{ item }}"
-    mode: '0700'
-  loop: "{{ user_subs }}"
-
-- name: Ensure authorized_keys is present
-  ansible.builtin.copy:
-    dest: "/home/{{ item }}/.ssh/authorized_keys"
-    owner: "{{ item }}"
-    group: "{{ item }}"
-    mode: '0600'
-  loop: "{{ user_subs }}"
-
-- name: Install bindfs package
-  ansible.builtin.package:
-    name: bindfs
-    state: present
-
-- name: Create the script directory
-  ansible.builtin.file:
-    path: "{{ script_dir }}"
-    state: directory
-    mode: '0755'
-
-- name: Copy the mount-storage script to the script directory
-  ansible.builtin.template:
-    src: "mount-storage.sh.j2"
-    dest: "{{ script_dir }}/{{ script_storage }}"
-    mode: '0755'
-
-- name: Make the script executable
-  ansible.builtin.file:
-    path: "{{ script_dir }}/{{ script_storage }}"
-    mode: '0755'
-    state: file
-
-- name: Copy the mount-storage service template to /etc/systemd/system
-  ansible.builtin.template:
-    src: "mount-storage.service.j2"
-    dest: "{{ systemd_dir }}/{{ storage_service_name }}"
-    mode: '0644'
-
-- name: Reload systemd
-  ansible.builtin.systemd:
-    daemon_reload: yes
-
-- name: Enable the mount-storage service
-  ansible.builtin.systemd:
-    name: "{{ storage_service_name }}"
-    enabled: yes
-
-- name: Start the mount-storage service
-  ansible.builtin.systemd:
-    name: "{{ storage_service_name }}"
-    state: started
+- name: Fail if operation is not specified correctly
+  ansible.builtin.fail:
+    msg: "You must specify 'operation' as either 'install' or 'uninstall'."
+  when: operation not in ['install', 'uninstall']
