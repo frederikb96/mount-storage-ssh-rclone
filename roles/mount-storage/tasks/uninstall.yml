@@ -31,14 +31,14 @@
 
 - name: Remove rclone config file
   ansible.builtin.file:
-    path: "/etc/rclone/rclone.conf"
+    path: "{{ rclone_config }}"
     state: absent
 
 - name: Ensure users from user_subs are removed
   ansible.builtin.user:
     name: "{{ item }}"
     state: absent
-    remove: yes  # Removes the user and their home directory
+    remove: yes
   loop: "{{ user_subs }}"
 
 - name: Reload systemd to reflect the removal of the service

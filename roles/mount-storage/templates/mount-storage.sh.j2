@@ -1,21 +1,18 @@
 #!/bin/bash
 
-# This script, should mount the storage, and then bindfs the subdirectories to the main mount
-# Then its done, and the script should exit
+# This script should mount the storage and then bindfs the subdirectories to the main mount.
+# Once done, the script should exit.
 
 # Stop function
 function stop() {
     echo "Stopping..."
     # Unmount all the subdirectories
-    for sub in {% for entry in subs %}{{ entry.sub }} {% endfor %}; do
-        umount /mnt/storage/{{ sub }}
-    done
+    {% for entry in subs %}
+    umount {{ mount_subs }}/{{ entry.sub }}
+    {% endfor %}
 
     # Unmount the main mount
     umount {{ mount_point }}
-
-    # Unmount the rclone mount
-    umount {{ mount_sftp }}
 
     # If any unmounting fails, forcefully unmount all
     cleanup
@@ -24,24 +21,21 @@ function stop() {
 # Cleanup function
 function cleanup() {
     # Forcefully unmount all subdirectories
-    for sub in {% for entry in subs %}{{ entry.sub }} {% endfor %}; do
-        umount -lf /mnt/storage/{{ sub }}
-    done
+    {% for entry in subs %}
+    umount -lf {{ mount_subs }}/{{ entry.sub }}
+    {% endfor %}
 
     # Forcefully unmount the main mount
     umount -lf {{ mount_point }}
-
-    # Forcefully unmount the rclone mount
-    umount -lf {{ mount_sftp }}
 }
 
 # Function to check if mounts are already active
 function check_mounts() {
     # Check if any of the mounts are already mounted
     mount | grep -q "{{ mount_point }}" && return 1
-    for sub in {% for entry in subs %}{{ entry.sub }} {% endfor %}; do
-        mount | grep -q "/mnt/storage/{{ sub }}" && return 1
-    done
+    {% for entry in subs %}
+    mount | grep -q "{{ mount_subs }}/{{ entry.sub }}" && return 1
+    {% endfor %}
     return 0
 }
 
@@ -68,13 +62,14 @@ function startup() {
     sleep 5
 
     # Loop through and mount all subdirectories
-    for sub in {% for entry in subs %}{{ entry.sub }} {% endfor %}; do
-        mkdir -p {{ mount_subs }}/{{ sub }}
-        if ! bindfs --map=root/{{ entry.user }}:@root/@{{ entry.user }} /mnt/storage-main/{{ sub }} {{ mount_subs }}/{{ sub }}; then
-            stop
-            exit 1
-        fi
-    done
+    {% for entry in subs %}
+    mkdir -p {{ mount_point }}/{{ entry.sub }}
+    mkdir -p {{ mount_subs }}/{{ entry.sub }}
+    if ! bindfs --map=root/{{ entry.user }}:@root/@{{ entry.user }} {{ mount_point }}/{{ entry.sub }} {{ mount_subs }}/{{ entry.sub }}; then
+        stop
+        exit 1
+    fi
+    {% endfor %}
 
     echo "Startup mount process complete"
 }

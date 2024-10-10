@@ -22,12 +22,18 @@ function check() {
     fi
 
     # Check mount points
-    for sub in {% for entry in subs %}{{ entry.sub }} {% endfor %}; do
-        if ! mount | grep -q "{{ mount_subs }}/{{ sub }}"; then
-            echo "Mount {{ mount_subs }}/{{ sub }} is not available"
-            return 1
-        fi
-    done
+    {% for entry in subs %}
+    if ! mount | grep -q "{{ mount_subs }}/{{ entry.sub }}"; then
+        echo "Mount {{ mount_subs }}/{{ entry.sub }} is not available"
+        return 1
+    fi
+    {% endfor %}
+
+    # Check main mount
+    if ! mount | grep -q "{{ mount_point }}"; then
+        echo "Main mount {{ mount_point }} is not available"
+        return 1
+    fi
 
     # If both checks pass
     return 0

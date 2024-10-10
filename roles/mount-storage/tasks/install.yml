@@ -3,13 +3,13 @@
   ansible.builtin.user:
     name: "{{ item }}"
     home: "/home/{{ item }}"
-    createhome: yes
+    create_home: yes
     shell: /bin/bash
-    lock_passwd: yes
+    password_lock: yes
     state: present
   loop: "{{ user_subs }}"
 
-- name: Ensure .ssh directory exists and authorized_keys is empty for each user
+- name: Ensure .ssh directory exists
   file:
     path: "/home/{{ item }}/.ssh"
     state: directory
@@ -18,9 +18,10 @@
     mode: '0700'
   loop: "{{ user_subs }}"
 
-- name: Ensure authorized_keys is present
-  ansible.builtin.copy:
-    dest: "/home/{{ item }}/.ssh/authorized_keys"
+- name: Ensure authorized_keys file is present
+  ansible.builtin.file:
+    path: "/home/{{ item }}/.ssh/authorized_keys"
+    state: touch
     owner: "{{ item }}"
     group: "{{ item }}"
     mode: '0600'
@@ -31,10 +32,15 @@
     name: bindfs
     state: present
 
+- name: Install rclone package
+  ansible.builtin.package:
+    name: rclone
+    state: present
+
 - name: Copy rclone config file
   ansible.builtin.template:
     src: "rclone.conf.j2"
-    dest: "/etc/rclone/rclone.conf"
+    dest: "{{ rclone_config }}"
     owner: root
     group: root
     mode: '0644'
