@@ -8,7 +8,7 @@ function send_email() {
     echo "Sending email..."
     local subject="$1"
     local body="$2"
-    echo -e "Subject:${subject}\n\n${body}" | sendmail "{{ sendmail_recipient }}"
+    echo -e "Subject:${subject}\n\n${body}" | msmtp "{{ sendmail_recipient }}"
 }
 
 # SSH check function
