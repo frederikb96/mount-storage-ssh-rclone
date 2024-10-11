@@ -59,10 +59,12 @@ function routine() {
             echo "Error occurred"
             send_email "ERROR: Mount on {{ sendmail_device }}" "The storage mount is unavailable."
             # Enter a loop to keep checking only SSH until it's available again, then reboot
+            sleep 5
             while true; do
                 if check_ssh; then
                     echo "SSH is available again, rebooting..."
                     send_email "CLEAR: Mount on {{ sendmail_device }}" "SSH is available again. Rebooting..."
+                    sleep 10
                     /usr/bin/systemctl reboot
                 fi
                 sleep 60  # Wait for a minute before retrying SSH check
