@@ -10,7 +10,7 @@ ExecStartPre={{ script_dir }}/{{ script_storage }} --start
 ExecStart={{ script_dir }}/{{ script_check }} 
 ExecStop={{ script_dir }}/{{ script_storage }} --stop
 TimeoutStopSec=180s
-TimeoutStartSec=180s
+TimeoutStartSec=300s
 Restart=on-failure
 RestartSec=30s
 
