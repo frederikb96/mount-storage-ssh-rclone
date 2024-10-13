@@ -32,11 +32,6 @@
     name: bindfs
     state: present
 
-- name: Install rclone package
-  ansible.builtin.package:
-    name: rclone
-    state: present
-
 - name: Copy rclone config file
   ansible.builtin.template:
     src: "rclone.conf.j2"

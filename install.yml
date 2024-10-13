@@ -4,4 +4,5 @@
   vars:
     operation: "install"
   roles:
+    - stefangweichinger.ansible_rclone
     - mount-storage
