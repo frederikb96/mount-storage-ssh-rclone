@@ -15,7 +15,7 @@ function send_email() {
 # Try to perform a simple `ls` over SSH with a timeout.
 # Return 0 if SSH is reachable, 1 if not.
 function check_ssh() {
-    if ! timeout 10s ssh -p {{ sftp_port }} {{ sftp_user }}@{{ sftp_host }} ls > /dev/null 2>&1; then
+    if ! timeout 30s ssh -p {{ sftp_port }} {{ sftp_user }}@{{ sftp_host }} ls > /dev/null 2>&1; then
         echo "SSH check failed"
         return 1
     fi
