@@ -13,13 +13,18 @@ Before you start the installation, you must configure the variables in the `grou
 - **Email Setup**: Set up the email recipient (`sendmail_recipient`) and the device name (`sendmail_device`) to get notifications if something fails.
 
 ## Quickstart
+
+1. Install the required Ansible role:
+   ```
+   ansible-galaxy install stefangweichinger.ansible_rclone
+   ```
    
-1. Run the Ansible playbook to install the necessary components:
+2. Run the Ansible playbook to install the necessary components:
    ```
    ansible-playbook install.yml
    ```
 
-2. To uninstall the components:
+3. To uninstall the components:
    ```
    ansible-playbook uninstall.yml
    ```
