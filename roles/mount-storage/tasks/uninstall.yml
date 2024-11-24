@@ -34,13 +34,6 @@
     path: "{{ rclone_config }}"
     state: absent
 
-- name: Ensure users from user_subs are removed
-  ansible.builtin.user:
-    name: "{{ item }}"
-    state: absent
-    remove: yes
-  loop: "{{ user_subs }}"
-
 - name: Reload systemd to reflect the removal of the service
   ansible.builtin.systemd:
     daemon_reload: yes

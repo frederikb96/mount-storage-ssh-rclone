@@ -9,10 +9,6 @@ systemd_dir: "/etc/systemd/system"
 storage_service_name: "mount-storage.service"
 rclone_config: "/root/.config/rclone/rclone.conf"
 
-# Users to be created (without password) and their home directories
-user_subs:
-  - "bak-framework"
-
 # Configuration for SSH and mounts
 sftp_host: "your-storagebox-host"   # Update with your SFTP host
 sftp_user: "your-sftp-user"         # Update with your SFTP user
