@@ -13,6 +13,7 @@ rclone_config: "/root/.config/rclone/rclone.conf"
 sftp_host: "your-storagebox-host"   # Update with your SFTP host
 sftp_user: "your-sftp-user"         # Update with your SFTP user
 sftp_port: "your-sftp-port"         # Update with your SFTP port (default 22 or 23)
+sftp_key: "/root/.ssh/id_ed25519"
 mount_sftp: "your-sftp-mount"       # Name for your SFTP mount
 mount_crypt: "your-crypt-mount"     # Name for your encrypted mount
 hetzner_crypt_password: "your-password"  # Update with your crypt password
