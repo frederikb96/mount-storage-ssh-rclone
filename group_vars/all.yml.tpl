@@ -22,7 +22,7 @@ crypt_password: "your-password"  # Update with your crypt password
 mount_point: "/mnt/storage-main"    # Main mount point
 
 # Cache settings
-cache_enable: true
+cache_full_single_access_enabled: true
 cache_dir: "/mnt/cache-rclone"      # Cache directory for rclone
 
 # Subdirectories to be mounted and their associated users

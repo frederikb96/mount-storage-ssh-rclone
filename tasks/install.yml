@@ -23,6 +23,13 @@
     group: root
     mode: '0644'
 
+- name: Ensure the mount directories exist
+  ansible.builtin.file:
+    path: "{{ mount_subs }}/{{ item.sub }}"
+    state: directory
+    mode: "0755"
+  loop: "{{ subs }}"
+
 - name: Create the script directory
   ansible.builtin.file:
     path: "{{ script_dir }}"

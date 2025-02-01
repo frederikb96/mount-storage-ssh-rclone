@@ -58,10 +58,10 @@ function startup() {
 
     echo "Start main mount"
     mkdir -p {{ mount_point }}
-{% if cache_enable %}
+{% if cache_full_single_access_enabled %}
     if ! timeout 300s rclone mount {{ crypt_mount_name }}: {{ mount_point }} --allow-non-empty --vfs-cache-mode full --vfs-fast-fingerprint --vfs-cache-max-size 100G --vfs-cache-max-age 720h --vfs-cache-poll-interval 1h --uid 0 --gid 0 --dir-perms 0770 --file-perms 0770 --attr-timeout 720h --dir-cache-time 168h --poll-interval 12h --cache-dir {{ cache_dir }} --daemon; then
 {% else %}
-    if ! timeout 300s rclone mount {{ crypt_mount_name }}: {{ mount_point }} --allow-non-empty --uid 0 --gid 0 --dir-perms 0770 --file-perms 0770 --daemon; then
+    if ! timeout 300s rclone mount {{ crypt_mount_name }}: {{ mount_point }} --allow-non-empty --uid 0 --gid 0 --dir-perms 0770 --file-perms 0770 --vfs-cache-mode writes --cache-dir {{ cache_dir }} --daemon; then
 {% endif %}
         stop
         exit 1
