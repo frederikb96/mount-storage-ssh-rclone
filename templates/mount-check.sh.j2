@@ -49,13 +49,13 @@ function routine() {
         # Perform the full check
         if ! check; then
             echo "Error occurred"
-            send_email "ERROR: Mount on {{ ansible_hostname }}" "The storage mount is unavailable."
+            send_email "ERROR: {{ mount_point }} on {{ ansible_hostname }}" "The storage mount {{ mount_point }} is unavailable."
             # Enter a loop to keep checking only SSH until it's available again, then reboot
             sleep 5
             while true; do
                 if check_ssh; then
                     echo "SSH is available again, rebooting..."
-                    send_email "CLEAR: Mount on {{ ansible_hostname }}" "SSH is available again. Rebooting..."
+                    send_email "CLEAR: {{ mount_point }} on {{ ansible_hostname }}" "SSH for {{ mount_point }} is available again. Rebooting..."
                     sleep 10
                     /usr/bin/systemctl reboot
                 fi
