@@ -17,7 +17,7 @@
   ansible.builtin.blockinfile:
     path: "{{ rclone_config }}"
     block: "{{ lookup('template', 'rclone.conf.j2') }}"
-    marker: "# {mark} ANSIBLE RCLONE BASIC"
+    marker: "# {mark} ANSIBLE MANAGED BLOCK {{ mount_point }}"
     create: yes
     owner: root
     group: root

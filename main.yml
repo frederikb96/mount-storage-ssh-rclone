@@ -1,6 +1,8 @@
 ---
 - hosts: storage
   become: yes
+  vars_files:
+    - group_vars/storage.yml
   tasks:
     - name: Dependencies
       import_tasks: tasks/rclone.yml
