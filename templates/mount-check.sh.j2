@@ -15,7 +15,7 @@ function send_email() {
 # Try to perform a simple `ls` over SSH with a timeout.
 # Return 0 if SSH is reachable, 1 if not.
 function check_ssh() {
-    if ! timeout 30s ssh -p {{ sftp_port }} {{ sftp_user }}@{{ sftp_host }} ls > /dev/null 2>&1; then
+    if ! timeout 120s ssh -p {{ sftp_port }} {{ sftp_user }}@{{ sftp_host }} ls > /dev/null 2>&1; then
         echo "SSH check failed"
         return 1
     fi
@@ -30,14 +30,6 @@ function check() {
     if ! check_ssh; then
         return 1
     fi
-
-    # Check mount points
-    {% for entry in subs %}
-    if ! mount | grep -q "{{ mount_subs }}/{{ entry.sub }}"; then
-        echo "Mount {{ mount_subs }}/{{ entry.sub }} is not available"
-        return 1
-    fi
-    {% endfor %}
 
     # Check main mount
     if ! mount | grep -q "{{ mount_point }}"; then
@@ -57,13 +49,13 @@ function routine() {
         # Perform the full check
         if ! check; then
             echo "Error occurred"
-            send_email "ERROR: Mount on {{ sendmail_device }}" "The storage mount is unavailable."
+            send_email "ERROR: Mount on {{ ansible_hostname }}" "The storage mount is unavailable."
             # Enter a loop to keep checking only SSH until it's available again, then reboot
             sleep 5
             while true; do
                 if check_ssh; then
                     echo "SSH is available again, rebooting..."
-                    send_email "CLEAR: Mount on {{ sendmail_device }}" "SSH is available again. Rebooting..."
+                    send_email "CLEAR: Mount on {{ ansible_hostname }}" "SSH is available again. Rebooting..."
                     sleep 10
                     /usr/bin/systemctl reboot
                 fi
