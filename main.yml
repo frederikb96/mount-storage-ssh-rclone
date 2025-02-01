@@ -2,7 +2,7 @@
 - hosts: all
   become: yes
   tasks:
-    - name: dependencies
+    - name: Dependencies
       import_tasks: tasks/rclone.yml
-    - name: Inport task
-      import_tasks: tasks/rclone.yml
+    - name: Install service
+      import_tasks: tasks/install.yml
