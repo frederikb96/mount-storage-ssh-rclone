@@ -6,9 +6,9 @@ Before=docker.service
 
 [Service]
 Type=notify
-ExecStartPre={{ script_dir }}/{{ script_storage }} --start
-ExecStart={{ script_dir }}/{{ script_check }} 
-ExecStop={{ script_dir }}/{{ script_storage }} --stop
+ExecStartPre={{ script_dir }}/{{ script_name_storage }} --start
+ExecStart={{ script_dir }}/{{ script_name_check }} 
+ExecStop={{ script_dir }}/{{ script_name_storage }} --stop
 TimeoutStopSec=180s
 TimeoutStartSec=300s
 Restart=on-failure

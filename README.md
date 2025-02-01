@@ -7,7 +7,7 @@ This project automates the process of mounting storage via SSH and performing ad
 
 Before you start the installation, you must configure the variables in the `group_vars/all.yml` file. This file contains essential settings for the mounts, users, and systemd services.
 
-- **SSH Details**: Update `sftp_host`, `sftp_user`, `sftp_port`, and `hetzner_crypt_password` with your specific credentials for mounting the SFTP.
+- **SSH Details**: Update `sftp_host`, `sftp_user`, `sftp_port`, and `crypt_password` with your specific credentials for mounting the SFTP.
 - **Mount Points**: Define your main `mount_point` and subdirectories in the `subs` section for proper bind mounting.
 - **Email Setup**: Set up the email recipient (`sendmail_recipient`) to get notifications if something fails.
 

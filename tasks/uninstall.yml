@@ -16,12 +16,12 @@
 
 - name: Remove the mount-storage script from the script directory
   ansible.builtin.file:
-    path: "{{ script_dir }}/{{ script_storage }}"
+    path: "{{ script_dir }}/{{ script_name_storage }}"
     state: absent
 
 - name: Remove the mount-check script from the script directory
   ansible.builtin.file:
-    path: "{{ script_dir }}/{{ script_check }}"
+    path: "{{ script_dir }}/{{ script_name_check }}"
     state: absent
 
 - name: Remove the script directory if empty

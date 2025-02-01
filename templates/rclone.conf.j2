@@ -1,4 +1,4 @@
-[{{ mount_sftp }}]
+[{{ sftp_mount_name }}]
 type = sftp
 host = {{ sftp_host }}
 user =   {{ sftp_user }}
@@ -8,9 +8,9 @@ md5sum_command = md5 -r
 sha1sum_command = sha1 -r
 shell_type = unix
 
-[{{ mount_crypt }}]
+[{{ crypt_mount_name }}]
 type = crypt
-remote = {{ mount_sftp }}:crypt
+remote = {{ sftp_mount_name }}:crypt
 filename_encryption = standard
 directory_name_encryption = true
-password = {{ hetzner_crypt_password }}
+password = {{ crypt_password }}

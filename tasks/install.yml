@@ -32,13 +32,13 @@
 - name: Copy the mount-storage script to the script directory
   ansible.builtin.template:
     src: "mount-storage.sh.j2"
-    dest: "{{ script_dir }}/{{ script_storage }}"
+    dest: "{{ script_dir }}/{{ script_name_storage }}"
     mode: '0755'
 
 - name: Copy the mount-check script to the script directory
   ansible.builtin.template:
     src: "mount-check.sh.j2"
-    dest: "{{ script_dir }}/{{ script_check }}"
+    dest: "{{ script_dir }}/{{ script_name_check }}"
     mode: '0755'
 
 - name: Copy the mount-storage service template to /etc/systemd/system
