@@ -1,8 +1,0 @@
----
-- hosts: all
-  become: yes
-  vars:
-    operation: "install"
-  roles:
-    - stefangweichinger.ansible_rclone
-    - mount-storage

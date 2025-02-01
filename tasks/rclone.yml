@@ -1,0 +1,21 @@
+- name: Install or check Rclone version
+  shell: "sudo -v ; curl -s https://rclone.org/install.sh | sudo bash"
+  register: rclone_install
+  failed_when: >
+    rclone_install.rc != 0 and rclone_install.rc != 3
+  changed_when: "'already installed' not in rclone_install.stdout"
+  ignore_errors: true
+
+- name: Ensure Rclone self-update cron job is present
+  cron:
+    name: "Rclone Self-Update"
+    minute: "0"
+    hour: "22"
+    user: root
+    job: "rclone selfupdate >/dev/null 2>&1"
+    state: present
+
+- name: Install bindfs package
+  ansible.builtin.package:
+    name: bindfs
+    state: present

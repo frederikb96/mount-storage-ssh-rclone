@@ -1,8 +1,4 @@
 ---
-- name: Install bindfs package
-  ansible.builtin.package:
-    name: bindfs
-    state: present
 
 - name: Copy rclone config file
   ansible.builtin.template:

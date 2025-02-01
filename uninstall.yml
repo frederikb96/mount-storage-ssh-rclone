@@ -1,7 +1,0 @@
----
-- hosts: all
-  become: yes
-  vars:
-    operation: "uninstall"
-  roles:
-    - mount-storage

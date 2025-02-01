@@ -1,0 +1,8 @@
+---
+- hosts: all
+  become: yes
+  tasks:
+    - name: dependencies
+      import_tasks: tasks/rclone.yml
+    - name: Inport task
+      import_tasks: tasks/rclone.yml

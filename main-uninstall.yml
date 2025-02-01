@@ -1,0 +1,6 @@
+---
+- hosts: all
+  become: yes
+  tasks:
+    - name: Uninstall
+      import_tasks: tasks/uninstall.yml

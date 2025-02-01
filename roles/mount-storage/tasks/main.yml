@@ -1,9 +1,0 @@
----
-- name: Check if operation is install or uninstall
-  ansible.builtin.include_tasks: "{{ operation }}.yml"
-  when: operation in ['install', 'uninstall']
-
-- name: Fail if operation is not specified correctly
-  ansible.builtin.fail:
-    msg: "You must specify 'operation' as either 'install' or 'uninstall'."
-  when: operation not in ['install', 'uninstall']
