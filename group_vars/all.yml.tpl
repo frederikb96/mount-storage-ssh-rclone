@@ -34,4 +34,3 @@ subs:
 
 # Email notifications configuration
 sendmail_recipient: "your-email@example.com"  # Update with your email
-sendmail_device: "your-device-name"           # Name of the device (e.g., server name)

@@ -9,23 +9,18 @@ Before you start the installation, you must configure the variables in the `grou
 
 - **SSH Details**: Update `sftp_host`, `sftp_user`, `sftp_port`, and `hetzner_crypt_password` with your specific credentials for mounting the SFTP.
 - **Mount Points**: Define your main `mount_point` and subdirectories in the `subs` section for proper bind mounting.
-- **Email Setup**: Set up the email recipient (`sendmail_recipient`) and the device name (`sendmail_device`) to get notifications if something fails.
+- **Email Setup**: Set up the email recipient (`sendmail_recipient`) to get notifications if something fails.
 
 ## Quickstart
-
-1. Install the required Ansible role:
+ 
+1. Run the Ansible playbook to install the necessary components:
    ```
-   ansible-galaxy install stefangweichinger.ansible_rclone
-   ```
-   
-2. Run the Ansible playbook to install the necessary components:
-   ```
-   ansible-playbook install.yml
+   ansible-playbook main.yml
    ```
 
-3. To uninstall the components:
+2. To uninstall the components:
    ```
-   ansible-playbook uninstall.yml
+   ansible-playbook main-uninstall.yml
    ```
 
 ## Installation
@@ -41,5 +36,6 @@ The uninstallation process will:
 - Stop and disable the `mount-storage` systemd service.
 - Remove the mount and check scripts.
 - Remove the rclone configuration and other related files.
+- Mind: rclone and bindfs will not be uninstalled, as it may be used for other purposes.
 
 This provides a clean removal of the automated mount storage setup.
