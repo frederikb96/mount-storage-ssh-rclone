@@ -12,6 +12,10 @@ Before you start the installation, you must configure the variables in the `grou
 - **Email Setup**: Set up the email recipient (`sendmail_recipient`) to get notifications if something fails.
 
 ## Quickstart
+
+0. Prepare on your sftp server:
+   - The folder which should contain the mount point
+   - SSH access via ssh-key
  
 1. Run the Ansible playbook to install the necessary components:
    ```
