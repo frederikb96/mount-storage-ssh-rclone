@@ -1,5 +1,5 @@
 ---
-- hosts: all
+- hosts: storage
   become: yes
   tasks:
     - name: Dependencies
