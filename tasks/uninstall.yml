@@ -29,10 +29,15 @@
     path: "{{ script_dir }}"
     state: absent
 
-- name: Remove rclone config file
-  ansible.builtin.file:
+- name: Remove the rclone config line from the rclone config file
+  ansible.builtin.blockinfile:
     path: "{{ rclone_config }}"
-    state: absent
+    block: ""
+    marker: "# {mark} ANSIBLE RCLONE BASIC"
+    create: yes
+    owner: root
+    group: root
+    mode: '0644'
 
 - name: Reload systemd to reflect the removal of the service
   ansible.builtin.systemd:

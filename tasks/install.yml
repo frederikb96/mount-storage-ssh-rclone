@@ -1,9 +1,24 @@
 ---
 
-- name: Copy rclone config file
-  ansible.builtin.template:
-    src: "rclone.conf.j2"
-    dest: "{{ rclone_config }}"
+- name: Ensure rclone config directory exists
+  ansible.builtin.file:
+    path: "{{ rclone_config | dirname }}"
+    state: directory
+    owner: root
+    group: root
+    mode: '0755'
+
+- name: Ensure rclone config file exists only if missing
+  ansible.builtin.command: touch "{{ rclone_config }}"
+  args:
+    creates: "{{ rclone_config }}"
+
+- name: Template rclone config into the file using blockinfile
+  ansible.builtin.blockinfile:
+    path: "{{ rclone_config }}"
+    block: "{{ lookup('template', 'rclone.conf.j2') }}"
+    marker: "# {mark} ANSIBLE RCLONE BASIC"
+    create: yes
     owner: root
     group: root
     mode: '0644'
