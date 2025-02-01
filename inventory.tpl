@@ -1,2 +1,2 @@
-[all]
+[storage]
 ubuntu-vserver

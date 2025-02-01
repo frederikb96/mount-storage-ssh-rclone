@@ -44,7 +44,7 @@
 - name: Copy the mount-storage service template to /etc/systemd/system
   ansible.builtin.template:
     src: "mount-storage.service.j2"
-    dest: "{{ systemd_dir }}/{{ storage_service_name }}"
+    dest: "{{ systemd_dir }}/{{ storage_service_file }}"
     mode: '0644'
 
 - name: Reload systemd
@@ -53,10 +53,10 @@
 
 - name: Enable the mount-storage service
   ansible.builtin.systemd:
-    name: "{{ storage_service_name }}"
+    name: "{{ storage_service_file }}"
     enabled: yes
 
 - name: Start the mount-storage service
   ansible.builtin.systemd:
-    name: "{{ storage_service_name }}"
+    name: "{{ storage_service_file }}"
     state: started

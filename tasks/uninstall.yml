@@ -1,17 +1,17 @@
 ---
 - name: Stop the mount-storage service
   ansible.builtin.systemd:
-    name: "{{ storage_service_name }}"
+    name: "{{ storage_service_file }}"
     state: stopped
 
 - name: Disable the mount-storage service
   ansible.builtin.systemd:
-    name: "{{ storage_service_name }}"
+    name: "{{ storage_service_file }}"
     enabled: no
 
 - name: Remove the mount-storage service file from systemd
   ansible.builtin.file:
-    path: "{{ systemd_dir }}/{{ storage_service_name }}"
+    path: "{{ systemd_dir }}/{{ storage_service_file }}"
     state: absent
 
 - name: Remove the mount-storage script from the script directory

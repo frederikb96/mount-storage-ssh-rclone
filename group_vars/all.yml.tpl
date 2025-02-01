@@ -6,7 +6,8 @@ script_dir: "/opt/mount-storage"
 script_name_storage: "mount-storage.sh"
 script_name_check: "mount-check.sh"
 systemd_dir: "/etc/systemd/system"
-storage_service_name: "mount-storage.service"
+storage_service_file: "mount-storage.service"
+storage_service_name: "mount-storage"
 rclone_config: "/root/.config/rclone/rclone.conf"
 
 # Configuration for SSH and mounts
@@ -19,6 +20,9 @@ sftp_mount_name: "your-sftp-mount"       # Name for your SFTP mount
 crypt_mount_name: "your-crypt-mount"     # Name for your encrypted mount
 crypt_password: "your-password"  # Update with your crypt password
 mount_point: "/mnt/storage-main"    # Main mount point
+
+# Cache settings
+cache_enable: true
 cache_dir: "/mnt/cache-rclone"      # Cache directory for rclone
 
 # Subdirectories to be mounted and their associated users
