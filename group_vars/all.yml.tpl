@@ -14,6 +14,7 @@ sftp_host: "your-storagebox-host"   # Update with your SFTP host
 sftp_user: "your-sftp-user"         # Update with your SFTP user
 sftp_port: "your-sftp-port"         # Update with your SFTP port (default 22 or 23)
 sftp_key: "/root/.ssh/id_ed25519"
+sftp_path: "some-path-on-your-sftp" # Update with your SFTP path
 sftp_mount_name: "your-sftp-mount"       # Name for your SFTP mount
 crypt_mount_name: "your-crypt-mount"     # Name for your encrypted mount
 crypt_password: "your-password"  # Update with your crypt password

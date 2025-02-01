@@ -10,7 +10,7 @@ shell_type = unix
 
 [{{ crypt_mount_name }}]
 type = crypt
-remote = {{ sftp_mount_name }}:crypt
+remote = {{ sftp_mount_name }}:{{ sftp_path }}
 filename_encryption = standard
 directory_name_encryption = true
 password = {{ crypt_password }}
