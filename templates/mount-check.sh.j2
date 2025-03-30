@@ -11,15 +11,24 @@ function send_email() {
     echo -e "Subject:${subject}\n\n${body}" | msmtp "{{ sendmail_recipient }}"
 }
 
-# SSH check function
-# Try to perform a simple `ls` over SSH with a timeout.
-# Return 0 if SSH is reachable, 1 if not.
+# SSH check function with retry
+# Tries multiple times to connect via SSH to the SFTP server.
+# Returns 0 if successful, 1 if not.
 function check_ssh() {
-    if ! timeout 120s ssh -p {{ sftp_port }} {{ sftp_user }}@{{ sftp_host }} ls > /dev/null 2>&1; then
-        echo "SSH check failed"
-        return 1
-    fi
-    return 0
+    local max_attempts=5
+    local attempt=1
+
+    while (( attempt <= max_attempts )); do
+        if timeout 30s ssh -p {{ sftp_port }} {{ sftp_user }}@{{ sftp_host }} ls > /dev/null 2>&1; then
+            return 0
+        fi
+        echo "SSH check failed (attempt $attempt of $max_attempts)"
+        (( attempt++ ))
+        sleep 10
+    done
+
+    echo "SSH check failed after $max_attempts attempts"
+    return 1
 }
 
 # Full check function
